@@ -393,6 +393,142 @@ Develop a scalable, secure, and modular booking system demo tailored to the golf
 
 ---
 
+## 🧩 Microservice Implementation Guide — UserService (ASP.NET Core)
+
+This document outlines how to scaffold and build the `UserService` microservice in a Clean Architecture pattern using Visual Studio or CLI. It includes solution setup, project structure, commands, NuGet packages, and initial configuration for authentication.
+
+---
+
+### 🎯 Objective
+Create the foundational UserService to manage:
+- User registration & login
+- JWT authentication
+- Role & claims management
+- Integration with Azure Key Vault (for secrets)
+
+---
+
+### 🛠️ Step 1: Create the Solution & Projects
+
+#### Option A: Using CLI (Recommended for Clean Architecture)
+```bash
+mkdir GolfBookingSystem
+cd GolfBookingSystem
+
+# Create the solution file
+dotnet new sln -n GolfBookingSystem
+
+# Create layered projects
+dotnet new classlib -n UserService.Domain
+mkdir -p UserService.Domain/Entities
+
+# Application layer (CQRS, interfaces, validators)
+dotnet new classlib -n UserService.Application
+
+# Infrastructure (EF Core, Identity, external services)
+dotnet new classlib -n UserService.Infrastructure
+
+# API layer (entry point)
+dotnet new webapi -n UserService.API
+
+# Add projects to solution
+dotnet sln add UserService.*/*.csproj
+
+# Reference layer dependencies
+cd UserService.Application
+ dotnet add reference ../UserService.Domain/UserService.Domain.csproj
+cd ../UserService.Infrastructure
+ dotnet add reference ../UserService.Application/UserService.Application.csproj
+cd ../UserService.API
+ dotnet add reference ../UserService.Application/UserService.Application.csproj
+ dotnet add reference ../UserService.Infrastructure/UserService.Infrastructure.csproj
+```
+
+#### Option B: Visual Studio (Manual UI)
+1. Create an empty solution named `GolfBookingSystem`
+2. Add new projects:
+   - Class Library: `UserService.Domain`
+   - Class Library: `UserService.Application`
+   - Class Library: `UserService.Infrastructure`
+   - ASP.NET Core Web API: `UserService.API`
+3. Add project references manually between layers
+
+---
+
+### 📁 Recommended Folder Structure
+```
+UserService.Domain
+  └── Entities
+  └── ValueObjects
+
+UserService.Application
+  └── Interfaces
+  └── DTOs
+  └── Features (CQRS)
+  └── Validators
+
+UserService.Infrastructure
+  └── Identity
+  └── Persistence
+  └── Services
+
+UserService.API
+  └── Controllers
+  └── Extensions
+  └── Middlewares
+  └── appsettings.json
+```
+
+---
+
+### 📦 Step 2: Install Required NuGet Packages
+
+#### Domain Project (UserService.Domain)
+_No packages required yet._
+
+#### Application Project (UserService.Application)
+```bash
+dotnet add package MediatR.Extensions.Microsoft.DependencyInjection
+```
+
+#### Infrastructure Project (UserService.Infrastructure)
+```bash
+# Entity Framework Core
+ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+ dotnet add package Microsoft.EntityFrameworkCore.Tools
+
+# ASP.NET Identity with EF Core
+ dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+
+# Configuration Binding and Azure Key Vault
+ dotnet add package Microsoft.Extensions.Configuration.Binder
+ dotnet add package Azure.Extensions.AspNetCore.Configuration.Secrets
+ dotnet add package Azure.Identity
+```
+
+#### API Project (UserService.API)
+```bash
+# Authentication and Identity
+ dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+
+# Swagger for API docs
+ dotnet add package Swashbuckle.AspNetCore
+
+# FluentValidation
+ dotnet add package FluentValidation.AspNetCore
+```
+
+---
+
+### ✅ Next Step
+Once this skeleton and dependency setup is complete:
+- Implement IdentityDbContext and User entity
+- Configure JWT settings
+- Build Auth Controller
+- Implement CQRS for user registration and login
+- Secure with FluentValidation and global exception handling
+
+
 
 
 
